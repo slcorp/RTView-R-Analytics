@@ -1,4 +1,4 @@
-# RTView-R-Analytics
+# RTView - R Analytics
 
 Learn how R can be used to interactively explore relationships in data from your RTView repositories, and provide views that complement those available in RTView Enterprise Monitor. This will be a gentle introduction to R, with no prior experience assumed.
 
