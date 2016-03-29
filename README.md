@@ -4,9 +4,12 @@ Learn how R can be used to interactively explore relationships in data from your
 
 # System Requirements
 
-RTView 
+RTView
+
 R
+
 R Studio
+
 Java
 
 # Useful Links
