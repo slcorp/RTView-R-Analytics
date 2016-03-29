@@ -12,8 +12,11 @@ Java
 # Useful Links
 
 Download R: http://www.r-project.org/
+
 Download R Studio: http://www.rstudio.com/
+
 Download RTView: http://sl.com/evaluation-request/
+
 Download Java: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
 # RTView R Examples
