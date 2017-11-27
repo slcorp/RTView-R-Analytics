@@ -25,9 +25,9 @@ SL Blog Article: [Analytics on RTView Data Using R](http://sl.com/1700-2/)
 
 ### RTView Current Data
 
-In this example, we’ll query RTView using the REST interface for current data in the HostStats cache. So, the hosts dataframe has 4 rows and 30 columns. The “names” function gives us a list of the column names.
+In this example, we’ll query RTView using the REST interface for current data in the HostStats cache. The resulting dataframe has 4 rows and 30 columns. 
 
-**File name: [currentDataBWMon.R] (samples/currentDataBWMon.R)**
+**File name:** [currentDataBWMon.R] (samples/currentDataBWMon.R)
 
 ### RTView History
 
