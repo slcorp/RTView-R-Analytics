@@ -1,13 +1,17 @@
 # RTView - R Analytics
 
-Learn how R can be used to interactively explore relationships in data from your RTView repositories, and provide views that complement those available in RTView Enterprise Monitor. 
+Learn how R can be used to interactively explore relationships in data from your RTView repositories, and provide views that complement those available in RTView Enterprise Monitor.
+ 
+The following examples use a REST interface to pull cached metrics from your RTView dataservers. Query formats are documented in the RTView User Guide, and are simple HTTP GET requests that can be executed in any web browser. RTView caches provide current real-time values for metrics at a minimum, and may be configured to manage historic (time-series) data. As an example, the following REST query fetches TIBCO EMS metrics from a demo dataserver in the AWS cloud:
+
+http://rtvdemos-163.sl.com/simdata_rtvquery//cache/EmsQueueTotalsByServer/current?fmt=json&cols=time_stamp;URL;pendingMessageCount;inboundMessageRate;outboundMessageRate
+
 
 ## System Requirements
 
-* RTView
-* R
-* R Studio
-* Java
+* RTView		- source for metrics, either your own installed dataservers or demos in the cloud
+* R				- R language interpreter and compute engine
+* R Studio		- highly recommended IDE for testing and developing your own R applications
 
 ## Useful Links
 
@@ -16,15 +20,14 @@ Learn how R can be used to interactively explore relationships in data from your
 * Download RTView: http://sl.com/evaluation-request/
 * Download Java: http://www.oracle.com/technetwork/java/javase/downloads/index.html
 
-## RTView R Examples
+SL Blog Article: [Analytics on RTView Data Using R](http://sl.com/1700-2/)
 
-For each example listed here, the corresponding code is included in this package for you to test and play with (in this case R files). 
 
 ### RTView Current Data
 
 In this example, we’ll query RTView using the REST interface for current data in the HostStats cache. So, the hosts dataframe has 4 rows and 30 columns. The “names” function gives us a list of the column names.
 
-**File name: currentDataBWMon.R**
+**File name: [currentDataBWMon.R] (samples/currentDataBWMon.R)**
 
 ### RTView History
 
@@ -46,6 +49,4 @@ As a use case for this exercise, the goal will be to calculate an upper and lowe
 
 **File: bollingerBands.R**
 
-## For More Details on this Sample
 
-RTView Blog: http://sl.com/1700-2/
