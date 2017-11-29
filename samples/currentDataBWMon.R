@@ -1,3 +1,7 @@
+##
+##  Retrieve the current value of a metric from an RTView data server
+##
+
 # Set the working directory
 #setwd("C:/Users/GitHub/Repositories/RTView-R-Analytics/")
 

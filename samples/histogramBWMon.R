@@ -1,12 +1,14 @@
+##
+##  Plot a histogram, % Utilization versus number of hosts
+##
+#
 # Set your working directory
-setwd("C:/Users/GitHub/Repositories/RTView-R-Analytics/")
+#setwd("C:/Users/GitHub/Repositories/RTView-R-Analytics/")
 
-# Read data from your BWMon dataserver
-bw <- read.delim("http://myhost:myport/bwmon_rtvquery/cache/HostStats/current?fmt=text")
-dim(bw)
-
-# List column names in HostStats cache
-names(bw)
+# Read data from your dataserver
+histData <- read.delim("rtvdemos-163.sl.com/simdata_rtvquery/cache/HostStats/current?fmt=text")
+str(histData)
 
 #Plot histogram
-hist(bw$MemUsedPerCent,breaks=20)
+hist(histData$usedPerCentCpu,breaks=20,col="lightblue",main="Histogram of Host Utilization",xlab="% Usage",ylab="# Hosts")
+#hist(histData$MemUsedPerCent,breaks=20,col="lightgreen",main="Histogram of Host Utilization",xlab="% Usage",ylab="# Hosts")
