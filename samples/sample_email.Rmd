@@ -6,7 +6,7 @@ output: html_document
 ##use following lines for standalone report testing
 #tod <- Sys.time()
 #inputArgs <- c("VmwVmCpuUtilizationHigh","vSphere2~2008S-WIN44",3,4,5,6)
-#rtviewRestServer <- "localhost:8068"
+#rtvDataserver <- "localhost:8068"
 ```
 ***  
 Generated @ *`r tod`*  
@@ -25,7 +25,7 @@ Generated @ *`r tod`*
 source("sl_utils.R")
 alert_index <- unlist(strsplit(inputArgs[3],"~"))
 alert_index
-host <- getHistory(rtviewRestServer,alert_index[2],fcol="name",
+host <- getHistory(rtvDataserver,alert_index[2],fcol="name",
                         cache="VmwVirtualMachines",package="vmwmon_rtvquery",
                         col="time_stamp;mem.usage.average;cpu.usage.average",tr=600)
 library(ggplot2)

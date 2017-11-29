@@ -2,13 +2,13 @@
 #   R script to generate an email report for an alert.
 #
 #   set the following constants to send email.
-emailServer <- "192.9.200.21"
-recipients  <- c("ckominczak@sl.com")  # list of recipients
-acctName    <- "sl\\ckominczak"        # need a valid email account to send mail
-acctPassword <- "myAcc0unt"           # password for email account
+emailServer <- "emailTest.sl.com"
+recipients  <- c("someone@sl.com")  # list of recipients
+acctName    <- "sl\\someone"        # need a valid email account to send mail
+acctPassword <- "----------"        # password for email account
 
 # set location of RTView REST server for data fetched by template
-rtviewRestServer <- "localhost:8068"
+rtvDataserver <- "localhost:8068"
 #######################################################################
 
 source("sl_utils.R")
@@ -17,9 +17,11 @@ tod <- Sys.time()
 
 library(knitr)
 # use knitr to create html report from a R-markdown template
-mdFileName <- paste('sample_report_', Sys.getpid(), '.md', sep="")
-htmlFileName <- paste('sample_report_', Sys.getpid(), '.html', sep="")
-knit('sample_report.Rmd', output=mdFileName)
+# make filenames unique to handle alerts concurrently
+mdFileName <- paste('sample_email_', Sys.getpid(), '.md', sep="")
+htmlFileName <- paste('sample_email_', Sys.getpid(), '.html', sep="")
+knit('sample_email.Rmd', output=mdFileName)
+
 library(markdown)
 markdownToHTML(mdFileName, output=htmlFileName, options="")
 
