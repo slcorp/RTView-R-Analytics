@@ -44,21 +44,30 @@ getCacheHistory <- function(rtvServer, cache="EmsQueueTotalsByServer",
         timeFilter <- sprintf("tr=%s",tr)
         #timeFilter <- sprintf("tr=%s&te=%s000",tr,te)
         print("set tr only")
+        this.frequency <- .1
     } else {
         tb <- (unclass(Sys.Date()) - dayOffset)*86400 + tz_offset*3600
         trr <- tr * ndays
         timeFilter <- sprintf("tr=%s&tb=%s000",trr,tb)
+        this.frequency <- 96
     }
 
     url <- URLencode(paste(base_url,emsFilter,timeFilter,"sqlex=true",sep="&"))
-    #print(paste(">>>fetching URL: ",url))        # debug
+    print(paste(">>>fetching URL: ",url))        # debug
     ret <- read.delim(url, sep="\t")     # execute REST query; returns an R dataframe
+    #print(str(ret))
     ret$time_stamp <- as.POSIXct(ret$time_stamp,"%b %d, %Y %I:%M:%S %p",tz="")
-    delta_t <- (as.numeric(ret$time_stamp[2])-as.numeric(ret$time_stamp[1]))
-    #print(paste("deltat = ", delta_t))
-    #print(julian(ret$time_stamp[1]))
+    #delta_t <- (as.numeric(ret$time_stamp[2])-as.numeric(ret$time_stamp[1]))
+    delta_t <- difftime(ret$time_stamp[2],ret$time_stamp[1],units="secs")
+    print(paste("deltat = ", delta_t))
+    #print(ret$time_stamp[1])
     #print(ret$time_stamp[length(ret$time_stamp)])
-    ts(ret[,-1], start=as.Date(ret$time_stamp[1]), end=as.Date(ret$time_stamp[length(ret$time_stamp)]), frequency=96, deltat=delta_t) # 
+    # calculate end time as an integral number of delta_t time periods
+    endtime <- as.numeric(ret$time_stamp[1]) + delta_t * length(ret$time_stamp)
+    #ts(ret[,-1], start=as.Date(ret$time_stamp[1]), end=as.Date(ret$time_stamp[length(ret$time_stamp)]), frequency=this.frequency, deltat=delta_t)
+    ts(ret[,-1], start=as.numeric(ret$time_stamp[1]), end=endtime, frequency=this.frequency, deltat=delta_t)
+    #ts(ret[,-1], start=as.Date(ret$time_stamp[1]), end=endtime, frequency=this.frequency, deltat=delta_t)
+    #ts(ret[,-1], start=as.Date(ret$time_stamp[1]), frequency=this.frequency, deltat=delta_t)
 }
 
 
