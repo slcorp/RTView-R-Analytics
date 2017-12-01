@@ -46,7 +46,7 @@ RTView Enterprise Monitor provides heat maps for visualizing status of various m
 
 RTView Enterprise Monitor calls a user-editable script for each alert, so it's easy to craft custom responses to each alertable scenario. In this example, an R script snapshots metrics relevant to the alert instance, generates a plot for easy visualization, and then emails the result. When RTView EM generates an alert, it calls the \rtvapm\common\bin\my_alert_actions.bat(sh) script to perform default actions relevant to the alert. Users may customize this script to add any special processing (eg, email notification). Perform the following steps to start using rich email notifications in your RTView installation.
 
-####Installation instructions for custom email alert notifications
+#### Installation instructions for custom email alert notifications
 1) Install R and the packages referenced in the samples\r_alert_handler.R script. 
 2) Copy the alert actions script to your project:
 cp <path>\rtvapm\common\bin\my_alert_actions.bat(sh) <your project path>\project\servers\central
