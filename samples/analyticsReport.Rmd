@@ -1,0 +1,104 @@
+---
+title: "Using R for Analysis of RTView History Data"  
+output: html_document
+---
+```{r,echo=FALSE}
+## bindings from an RtvDraw html fragment
+rtviewDataServer <- "rtvdemos-163.sl.com"
+queryColumns <- "time_stamp;pendingMessageCount;inboundMessageRate;outboundMessageRate"  # set analysis column
+cacheName <- "EmsQueueTotalsByServer"
+filterColumn <- "URL"
+filterValue <- "tcp://VMIRIS1023:7222"
+```
+***  
+`r Sys.time()`
+
+This report is intended to demonstrate how easy it is to incorporate SL's RTView EM historic data into 
+your analytics and view the results as live reports on demand. This work should serve as a template for integrating your own reports with RTview EM. Since this is a demonstration, the emphasis is on ease of use and showing how to use this technology, rather than on mathematical rigor. In the following sections, we show the r statements necessary to produce each plot. The R markdown document for producing this report is available [here](rtviewAnalytics.Rmd). Consult R documentation and any of the numerous R resources on the web for explanations of how these R statements work.
+
+We'll be using the forecast package for R in this example. Unfortunately, in order to estimate the
+seasonal bias in models, these algorithms normally require at least two years of data. Since a suitable historic backlog
+was not readily available for EMS, we will use a time series from the EuStockMarkets dataset included with R. 
+Below, the closing price for the FTSE is used as the inbound message rate for an EMS server. 
+```{r, include=FALSE}
+library(forecast)
+library(ggplot2)
+library(tseries)
+```
+
+## Data Exploration
+
+In this section, we'll examine the raw data using some of the standard tools available to data scientists. First, we'll simply plot the raw observations. In some datasets, this might reveal a need to cleanse or pre-process the data to remove errors and inconsistencies, or perhaps apply a transformation in order to stationarize the data.
+```{r}
+# The following lines fetch history data from an RTView dataserver:
+#source("sl_utils.R")
+#EmsData <- getCacheHistory(dataserver,cacheName, "simdata_rtvquery", fcol=filterColumn,fval=filterValue,dayOffset=730,ndays=730,cols=columns)
+#EmsData <- ts(EmsData$inboundMessageRate, start=EmsData$time_stamp[1], deltat=15*60
+
+# get a test time series 2 years or longer to demo analytics with R
+EmsData <- EuStockMarkets[,"FTSE"]
+names(EmsData) <- c("inboundMessageRate")
+plot(EmsData, main="Inbound Message Rates for an EMS Server")
+
+```
+
+From the raw data plot, it is not apparent whether the magnitude of any seasonal contribution increases over time, so we will assume an additive model and decompose the time series into trend, seasonal, and random components.
+```{r}
+EmsDataComponents <- decompose(EmsData)
+plot(EmsDataComponents)
+```
+
+The seasonal variation is fairly small for this dataset, and is much smaller than our random component, which you can interpret as the residual. Let's plot the trend plus seasonal component against the observed data to get a better feel for the modeling error.
+
+```{r}
+plot(cbind(EmsData,EmsDataComponents$trend + EmsDataComponents$seasonal),
+     plot.type="single", col=c("blue", "red"), main="Observed Data vs Trend + Seasonal")
+```
+
+Since the "random" component does not look at all noisy, we'll look next for structure in this component. This can be seen in the following lag-plot.
+```{r}
+EmsRandomNoNAs <- na.omit(EmsDataComponents$random)
+lag.plot(EmsRandomNoNAs, main="Lag Plot of Random Component")
+```
+
+The lag-plot confirms that adjacent samples are indeed highly correlated. We can also see this in the following correlogram. The autocorrelation coefficient for the first lag will always be exactly one (ie, any dataset is perfectly correlated to itself). If the sample is white noise, coeffients at lags greater than one will be close to zero. 
+
+```{r}
+acf(EmsRandomNoNAs, lag.max=20, main="Auto-correlation Plot")
+```
+
+The acf plot is often used to determine if a series is stationary (ie, its statistics do not vary with time). Stationary series are much loved because they are easy to predict: future values are expected to be similar to current values (plus or minus a noise component)! Hence, data scientists may attempt to transform non-stationary data by removing trends and seasonal components. Future predictions for the original series can then be made by untransforming predictions for the stationarized series. It's quite easy to create models and forecasts in R, as we'll demonstrate in the next section. 
+
+
+## Forecasting
+
+We will generate a Holt-Winters model for the data from 1992 to the beginning of 1998, then use this to forecast behavior for the first three months of 1998.
+```{r}
+emsData92to98 <- window(EmsData,1992,1998)
+emsHoltWinters = HoltWinters(emsData92to98)
+plot(emsHoltWinters,main="Modeling Results from Holt-Winters")
+```
+
+The overlaid actual and fitted data match quite well on the above plot. 
+Next, we will use the Holt-Winters model to forecast the inbound message rate for the first three months of 1998.
+```{r}
+emsForecast = forecast(emsHoltWinters, h=90)
+plot(emsForecast,main="Forecast for 1998 via Host-Winters")
+```
+
+The forecasted trend appears to dither around the *recent* series mean, as you can see for the second half of 1997. The shaded areas show the 80 and 95 percent confidence levels.
+
+Note that the dataset includes observations into late 1998. Just for fun, let's compare the actual data from 1998 with the forecast.
+```{r}
+emsf <- emsForecast$mean
+emsf <- cbind(emsf, ts(emsForecast$lower,deltat=deltat(emsf),start=start(emsf)))
+emsf <- cbind(emsf, ts(emsForecast$upper,deltat=deltat(emsf),start=start(emsf)))
+
+color.scale <- c("blue", "red", "grey", "black", "grey", "black")
+line.types <- c(1,1,3,4,3,4)
+line.widths <- c(3,3,1,1,1,1)
+plot(cbind(window(EmsData,1998),emsf),plot.type="single",col=color.scale, lty=line.types, lwd=line.widths, main="Actual vs Predicted for 1998")
+legend(1998.4, 5000, legend=c("Actual","Predicted","80% Confidence","95% Confidence"), col=color.scale,lty=line.types,lwd=line.widths)
+```
+
+The 1998 forecast agrees somewhat with the actual data at the beginning, but poorly predicts the future after only a couple of weeks, suggesting that our model could use some improvement. But then, that's what the art of modeling is all about! 

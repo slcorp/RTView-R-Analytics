@@ -58,6 +58,8 @@ cp -r r_alert_handler.R alert_handlers <your project path>\project\servers\centr
 
 When the next alert occurs, the r_alert_handler.R script will execute the handler (if it exists) for the given alert type. A sample handler is provided in the alert_handlers directory, along with an html rendering to show what you can expect to appear in the body of the email sent by r_alert_handler.R. 
 
+Note: the code presented here demonstrates proof of concept. If you deploy this in a production environment, it is recommended that you modify the my_alert_actions.bat(sh) script to only fork an R engine for alerts that are handled, rather than letting the R script determine this as shown in this example.
+
 ### Intelligent Alerting
 
 The most basic type of alerting occurs when the current value of a metric exceeds a static threshold. However, alerting in this manner may only indicate a transient stress, so we may additionally require that the metric (either raw or smoothed) exceed the threshold for a certain amount of time. Such triggering rules can greatly reduce the incidence of false alarms, but are unsatisfactory in answering questions like "is the current load normal for this seasonally adjusted point in time". We are interested not only in cases where the key performance indicator (KPI) is not only significantly higher tham expected, but also much lower than expected, as this condition may indicate loss of inputs to an otherwise healthy system (eg, on-line customers are not able to complete orders, credit-card transactions are lagging, etc.) .
@@ -68,4 +70,8 @@ The attached R example calculates an expected upper and lower bound for total pe
 
 **File: bollingerBands.R**
 
+### Advanced Analytics
 
+The email notification example above introduced a method for generating rich documents using R markdown. This example demonstrates use of this technology to create on-demand reports incorporating complex R calculations and visualization of the results. These reports can be saved indefinitely in html or pdf formats for comparison over time. 
+
+**File: analyticsReport.Rmd**
