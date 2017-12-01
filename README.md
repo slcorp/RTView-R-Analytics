@@ -42,13 +42,29 @@ RTView Enterprise Monitor provides heat maps for visualizing status of various m
 
 **File: histogramBWMon.R**
 
+### Email Notifications
+
+RTView Enterprise Monitor calls a user-editable script for each alert, so it's easy to craft custom responses to each alertable scenario. In this example, an R script snapshots metrics relevant to the alert instance, generates a plot for easy visualization, and then emails the result. When RTView EM generates an alert, it calls the \rtvapm\common\bin\my_alert_actions.bat(sh) script to perform default actions relevant to the alert. Users may customize this script to add any special processing (eg, email notification). Perform the following steps to start using rich email notifications in your RTView installation.
+
+####Installation instructions for custom email alert notifications
+1) Install R and the packages referenced in the samples\r_alert_handler.R script. 
+2) Copy the alert actions script to your project:
+cp <path>\rtvapm\common\bin\my_alert_actions.bat(sh) <your project path>\project\servers\central
+3) Edit my_alert_actions.bat(sh), adding the following line near the end:
+Rscript r_alert_handler.R %DOMAINNAME% %ALERTNAME% %ALERTINDEX% %ALERTID% %ALERTSEVERITY% "%ALERTTEXT%"
+4) Edit the samples\r_alert_handler.R script in this repository to set values for the required parameters at the beginning of this script.
+5) Copy the r alert handler script and associated Rmd handlers to your project.
+cp -r r_alert_handler.R alert_handlers <your project path>\project\servers\central
+
+When the next alert occurs, the r_alert_handler.R script will execute the handler (if it exists) for the given alert type. A sample handler is provided in the alert_handlers directory, along with an html rendering to show what you can expect to appear in the body of the email sent by r_alert_handler.R. 
+
 ### Intelligent Alerting
 
 The most basic type of alerting occurs when the current value of a metric exceeds a static threshold. However, alerting in this manner may only indicate a transient stress, so we may additionally require that the metric (either raw or smoothed) exceed the threshold for a certain amount of time. Such triggering rules can greatly reduce the incidence of false alarms, but are unsatisfactory in answering questions like "is the current load normal for this seasonally adjusted point in time". We are interested not only in cases where the key performance indicator (KPI) is not only significantly higher tham expected, but also much lower than expected, as this condition may indicate loss of inputs to an otherwise healthy system (eg, on-line customers are not able to complete orders, credit-card transactions are lagging, etc.) .
 
 To answer such questions, we turn to dynamically computed thresholds. The classic example is “Bollinger Bands”, where the upper and lower bounds are plotted as the moving average for the metric plus or minus a standard deviation (or two). Given these bounding time-series, it is possible to generate alerts when the real-time trend crosses either boundary. Although the calculations to produce these high and low bounds could be done by RTView, this examples demonstrates the basic idea using R. 
 
-The attached R example calculates an upper and lower bound for total pending messages queued by a TIBCO EMS server over the next 24 hours. From a technical standpoint, a big problem with modeling the time-series for a KPI is that it's quite often "non-stationary". That is, its statistics (mean and variance) vary with time, and this makes it tricky to determine appropriate upper and lower bounds. Fortunately, R comes to the rescue with a number of packaged methods to help "stationarize" your data. In this example, we remove the trend by a standard technique (differencing), calculate the standard deviation, and then add and subtract it from a smoothed average for the last two weeks to arrive at a suitable high and low bounds for the KPI. 
+The attached R example calculates an expected upper and lower bound for total pending messages queued by a TIBCO EMS server for the next 24 hours. From a technical standpoint, a big problem with modeling the time-series for a KPI is that it's quite often "non-stationary". That is, its statistics (mean and variance) vary with time, and this makes it tricky to determine appropriate upper and lower bounds. Fortunately, R comes to the rescue with a number of packaged methods to help "stationarize" your data. In this example, we remove the trend by a standard technique (differencing), calculate the standard deviation, and then add and subtract it from a smoothed average for the last two weeks to arrive at a suitable high and low bounds for the KPI. 
 
 **File: bollingerBands.R**
 

@@ -4,9 +4,9 @@ output: html_document
 ---
 ```{r,echo=FALSE}
 ##use following lines for standalone report testing
-#inputArgs <- c("CENTRAL","VmwVmCpuUtilizationHigh","vSphere2~VMIRIS1061",1035,1,"High Warning Limit exceeded current value: 69.26 limit: 50.0")
-#rtvDataserver <- "rtvdemos-163.sl.com"
-#rtvquery <- "simdata_rtvquery"
+inputArgs <- c("CENTRAL","VmwVmCpuUtilizationHigh","vSphere2~VMIRIS1061",1035,1,"High Warning Limit exceeded current value: 69.26 limit: 50.0")
+rtvDataserver <- "rtvdemos-163.sl.com"
+rtvquery <- "simdata_rtvquery"
 ```
 ***  
 Generated @ *`r Sys.time()`*  
