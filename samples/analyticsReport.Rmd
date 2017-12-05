@@ -11,12 +11,12 @@ filterColumn <- "URL"
 filterValue <- "tcp://VMIRIS1023:7222"
 ```
 ***  
-`r Sys.time()`
+Report generated on `r Sys.time()`
 
 This report is intended to demonstrate how easy it is to incorporate SL's RTView EM historic data into 
 your analytics and view the results as live reports on demand. This work should serve as a template for integrating your own reports with RTview EM. Since this is a demonstration, the emphasis is on ease of use and showing how to use this technology, rather than on mathematical rigor. In the following sections, we show the r statements necessary to produce each plot. The R markdown document for producing this report is available [here](rtviewAnalytics.Rmd). Consult R documentation and any of the numerous R resources on the web for explanations of how these R statements work.
 
-We'll be using the forecast package for R in this example. Unfortunately, in order to estimate the
+We'll be using the forecast package for R in this example. We will apply various modelling techniques to time-series data for the pending messages in a Tibco EMS queue. Unfortunately, in order to estimate the
 seasonal bias in models, these algorithms normally require at least two years of data. Since a suitable historic backlog
 was not readily available for EMS, we will use a time series from the EuStockMarkets dataset included with R. 
 Below, the closing price for the FTSE is used as the inbound message rate for an EMS server. 
@@ -28,7 +28,7 @@ library(tseries)
 
 ## Data Exploration
 
-In this section, we'll examine the raw data using some of the standard tools available to data scientists. First, we'll simply plot the raw observations. In some datasets, this might reveal a need to cleanse or pre-process the data to remove errors and inconsistencies, or perhaps apply a transformation in order to stationarize the data.
+In this section, we'll examine the raw data using some of the standard tools available to data scientists. First, we'll simply plot the raw observations. In some datasets, this might reveal a need to cleanse or pre-process the data to remove errors and inconsistencies, or perhaps apply a transformation in order to *stationarize* (more on this later) the data.
 ```{r}
 # The following lines fetch history data from an RTView dataserver:
 #source("sl_utils.R")
@@ -61,13 +61,19 @@ EmsRandomNoNAs <- na.omit(EmsDataComponents$random)
 lag.plot(EmsRandomNoNAs, main="Lag Plot of Random Component")
 ```
 
-The lag-plot confirms that adjacent samples are indeed highly correlated. We can also see this in the following correlogram. The autocorrelation coefficient for the first lag will always be exactly one (ie, any dataset is perfectly correlated to itself). If the sample is white noise, coeffients at lags greater than one will be close to zero. 
+The lag-plot confirms that adjacent samples are indeed highly correlated. We can also see this in the following correlogram. The autocorrelation coefficient for zero lag will always be exactly one (ie, any dataset is perfectly correlated to itself). If the sample is white noise, coeffients at lags greater than one will be close to zero. 
 
 ```{r}
 acf(EmsRandomNoNAs, lag.max=20, main="Auto-correlation Plot")
 ```
 
-The acf plot is often used to determine if a series is stationary (ie, its statistics do not vary with time). Stationary series are much loved because they are easy to predict: future values are expected to be similar to current values (plus or minus a noise component)! Hence, data scientists may attempt to transform non-stationary data by removing trends and seasonal components. Future predictions for the original series can then be made by untransforming predictions for the stationarized series. It's quite easy to create models and forecasts in R, as we'll demonstrate in the next section. 
+The acf plot is often used to determine if a series is stationary (ie, its statistics do not vary with time). Here, the slow decay of the peaks well-above the significance region indicate a non-stationary series. This is confirmed by the KPSS test, where a p-value 
+```{r}
+require(tseries)
+kpss.test(EmsRandomNoNAs)
+```
+
+Stationary series are much loved because they are easy to predict: future values are expected to be similar to current values (plus or minus a noise component)! Hence, data scientists may attempt to transform non-stationary data by removing trends and seasonal components. Future predictions for the original series can then be made by untransforming predictions for the stationarized series. It's quite easy to create models and forecasts in R, as we'll demonstrate in the next section. 
 
 
 ## Forecasting
