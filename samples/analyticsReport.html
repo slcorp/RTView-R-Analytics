@@ -123,7 +123,7 @@ $(document).ready(function () {
 
 
 <hr />
-<p>Report generated on 2017-12-05 09:33:48</p>
+<p>Report generated on 2017-12-06 17:09:32</p>
 <p>This report is intended to demonstrate how easy it is to incorporate SL’s RTView EM historic data into your analytics and view the results as live reports on demand. This work should serve as a template for integrating your own reports with RTview EM. Since this is a demonstration, the emphasis is on ease of use and showing how to use this technology, rather than on mathematical rigor. In the following sections, we show the r statements necessary to produce each plot. The R markdown document for producing this report is available <a href="rtviewAnalytics.Rmd">here</a>. Consult R documentation and any of the numerous R resources on the web for explanations of how these R statements work.</p>
 <p>We’ll be using the forecast package for R in this example. We will apply various modelling techniques to time-series data for the pending messages in a Tibco EMS queue. Unfortunately, in order to estimate the seasonal bias in models, these algorithms normally require at least two years of data. Since a suitable historic backlog was not readily available for EMS, we will use a time series from the EuStockMarkets dataset included with R. Below, the closing price for the FTSE is used as the inbound message rate for an EMS server.</p>
 <div id="data-exploration" class="section level2">
