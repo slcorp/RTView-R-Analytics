@@ -28,8 +28,8 @@ alert_index
 host <- getCacheHistory(rtvDataserver,fval=alert_index[2],fcol="name",
                         cache="VmwVirtualMachines",package=rtvquery,
                         col="time_stamp;cpu.usage.average;mem.usage.average",tr=600)
-library(ggplot2)
 ```
+
 ```{r, echo=FALSE}
 # plot labels
 xstart <- floor(start(host)/60)*60

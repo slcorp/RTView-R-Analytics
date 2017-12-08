@@ -51,6 +51,7 @@ RTView Enterprise Monitor calls a user-editable script for each alert, so it's e
 2) Copy the alert actions script to your project:
 cp <path>\rtvapm\common\bin\my_alert_actions.bat(sh) <your project path>\project\servers\central
 3) Edit my_alert_actions.bat(sh), adding the following line near the end:
+
 Rscript r_alert_handler.R %DOMAINNAME% %ALERTNAME% %ALERTINDEX% %ALERTID% %ALERTSEVERITY% "%ALERTTEXT%"
 4) Edit the samples\r_alert_handler.R script in this repository to set values for the required parameters at the beginning of this script.
 5) Copy the r alert handler script and associated Rmd handlers to your project.
