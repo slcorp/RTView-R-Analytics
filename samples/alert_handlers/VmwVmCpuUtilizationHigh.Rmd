@@ -1,0 +1,48 @@
+---
+title: "Alert Report"  
+output: html_document
+---
+```{r,echo=FALSE}
+##use following lines for standalone report testing
+inputArgs <- c("CENTRAL","VmwVmCpuUtilizationHigh","vSphere2~VMIRIS1061",1035,1,"High Warning Limit exceeded current value: 69.26 limit: 50.0")
+rtvDataserver <- "rtvdemos-163.sl.com"
+rtvquery <- "simdata_rtvquery"
+```
+***  
+Generated @ *`r Sys.time()`*  
+
+***
+
+**DOMAIN NAME:**    `r inputArgs[1]`  
+**ALERT NAME:**     `r inputArgs[2]`  
+**ALERT INDEX:** `r inputArgs[3]`  
+**ALERT ID:** `r inputArgs[4]`  
+**ALERT SEVERITY:** `r inputArgs[5]`  
+**ALERT TEXT:** `r inputArgs[6]`  
+
+***
+```{r, echo=FALSE, include=FALSE}
+source("../sl_utils.R")
+alert_index <- unlist(strsplit(inputArgs[3],"~"))
+alert_index
+host <- getCacheHistory(rtvDataserver,fval=alert_index[2],fcol="name",
+                        cache="VmwVirtualMachines",package=rtvquery,
+                        col="time_stamp;cpu.usage.average;mem.usage.average",tr=600)
+```
+
+```{r, echo=FALSE}
+# plot labels
+xstart <- floor(start(host)/60)*60
+xend <- ceiling(end(host)/60)*60
+
+color.scale <- c("green", "blue")
+line.types <- c(1,1)
+plot(host,plot.type="single",col=color.scale,lty=line.types,main="System Utilization, 10 minutes preceding Alert",ylab="% Utilization",xlab="Time (minutes)",axes=FALSE)
+axis(2,seq(0,100,by=10))
+ticks <- seq(xstart, xend, by=60)
+xlabels <- seq((xstart/60),((xend/60)),by=1) %% 60
+axis(1, at=ticks, labels=xlabels)
+yleg <- (host[1,1]+host[1,2])/2 + 5
+legend(end(host)-150,yleg,legend=c("%CPU","%Memory"), lty=line.types, col=color.scale)
+```
+
